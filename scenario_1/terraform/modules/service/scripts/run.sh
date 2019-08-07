@@ -25,6 +25,11 @@ sudo mv /home/ec2-user/kibana.repo /etc/yum.repos.d/
 sudo yum -y install kibana
 sudo mv /home/ec2-user/kibana.yml /etc/kibana/
 
+# Allow password login
+echo "password" | sudo passwd "ec2-user" --stdin
+sudo sed -i 's/#PasswordAuthentication/PasswordAuthentication/g' /etc/ssh/sshd_config
+sudo service sshd restart
+
 # Note: start elastic stack and service in Terraform
 sudo systemctl start elasticsearch.service
 sudo nohup /usr/share/logstash/bin/logstash -f /etc/logstash/logstash.conf &
