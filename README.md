@@ -1,5 +1,7 @@
 # DevOps/SRE Hands-On Triage Interview Questions
 
+Feel free to fork this repo and create your own triage scenarios. The Terraform script will automatically spin up an EC2 instance with the full Elastic Stack deployed and the Kibana endpoint exposed on port `5601`. You will just need to point Filebeat (configuration file located at `/etc/filebeat/filebeat.yml`) to your own application logs or implement other [beats](https://www.elastic.co/products/beats) for your use case. Please share your ideas!
+
 ## Introduction
 
 This repository contains a series of hands-on interview questions for DevOps/SRE interview candidates. Each question simulates common scenarios that a DevOps/SRE might encounter when running a production environment. The interviewee candidate should be able to assess the situation using the provided monitoring tools, and triage the problem to get critical services back online. Follow-up questions should focus on monitoring, infrastructure changes or automation strategies to prevent future occurrences of the same problem.
