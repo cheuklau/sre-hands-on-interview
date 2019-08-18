@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This repository contains a series of hands-on interview questions for DevOps/SRE interview candidates. Each question simulates relatively common scenarios that a DevOps/SRE might encounter when running a production environment. The interview candidate should be able to assess the situation using the provided monitoring tools, and triage the problem to get critical services back online. Follow-up questions should focus on monitoring, infrastructure changes or automation strategies to prevent future occurrences of the same problem.
+This repository contains a series of hands-on interview questions for DevOps/SRE interview candidates. Each question simulates common scenarios that a DevOps/SRE might encounter when running a production environment. The interviewee candidate should be able to assess the situation using the provided monitoring tools, and triage the problem to get critical services back online. Follow-up questions should focus on monitoring, infrastructure changes or automation strategies to prevent future occurrences of the same problem.
 
 ## Scenario 1
 
@@ -16,11 +16,11 @@ This repository contains a series of hands-on interview questions for DevOps/SRE
 ### Infrastructure Setting
 
 Terraform spins up an AWS Ubuntu 16.04 EC2 instance with the following installed:
-- A business critical service
-- Filebeat for monitoring the buisniess critical service logs
-- Logstash for parsing the Filebeat events
-- Elasticsearch for indexing the parsed events from Logstash
-- Kibana for displaying log events in real time 
+- A business-critical service
+- Filebeat for monitoring application logs
+- Logstash for parsing events from Filebeat
+- Elasticsearch for indexing output from Logstash
+- Kibana for displaying application logs in real time 
 
 ### Transient
 
@@ -28,21 +28,19 @@ The following series of events will occur:
 1. For 300 seconds, `INFO` messages appear showing the number of documents processed by the business critical service
 2. For 120 seconds, `WARN` messages appear showing storage is getting progressively full
 3. A final `ERROR` message appears showing an out-of-space error
-No additional logs after the final `ERROR` log indicates the process has died.
+No additional logs after the final `ERROR` message indicates the process has died.
 
 ### Suggested Approach
 
 The interviewee should perform the following:
-1. Recognize that the business critical service died to a filesystem being full
+1. Recognize that the business critical service died to an out-of-space filesystem
 2. Recognize that a business critical service needs to be triaged immediately
-3. SSH into machine via terminal
-    * Machine IP is the same as used to access Kibana (see if candidate can identify this)
-    * `ssh -i <private key> ec2-user@<machine-ip>`
-4. Perform `df -h` to see which filesystem is full
+3. SSH into machine via terminal with provided username and password
+4. Run `df -h` to see which filesystem is full
     * The result will show `/run/user/1000` is at `100%`
 5. Delete the file with `rm /run/user/1000/dummy.log`
-6. Restart the process with `sudo python service.py`
-7. Verify in monitoring that `INFO` logs are back
+6. Restart the process with `sudo python service.py` (command given by developers to restart the process)
+7. Verify in monitoring that `INFO` logs are being generated again
 
 ### Follow-up Questions
 
@@ -50,16 +48,11 @@ The interviewee should perform the following:
     * Run as a unit file using systemd which will handle restarts
     * Run as a container using a container orchestration platform
 2. What are some possible improvements to the monitoring dashboard?
-    * System resources e.g., CPU, memory
-    * Disk usage of relevant filesystems
+    * System resources e.g., CPU, memory and most importantly disk usage
 3. How could we avoid this problem in the future?
     * Mount `/run` to a larger filesystem
     * Ask developer to avoid writing into `/run`
-    * Monitor `/run` usage and empty directory after reaching a certain size
-4. What type of alerting  would you recommend for this dashboard?
-    * No events for some given time period as this indicates the process is dead
-    * `ERROR` or `WARN` logs observed for any given period as this indicates application-level problems
-    * If disk space is above a certain threshold for a relevant filesystem
+    * Monitor `/run` usage and automatically empty directory after reaching a certain size (e.g., `cronjob`)
 
 ### Build Instructions
 
@@ -75,4 +68,4 @@ To set up the interview environment perform the following:
     * Go to `dashboards`
     * Click `add` and select `log status timelion` and `last log`
 - The above dashboard and an empty terminal constitutes the interview environment
-    * The local directory should have the SSH private key
+    * The login username and password is `ec2-user` and `password`
